@@ -1,0 +1,207 @@
+PIXI SCENE GENERATION MASTER PROMPT
+
+Use this exact instruction with any AI that generates new Pixi scene files for this project.
+
+START OF PROMPT TO GIVE THE AI
+
+You are generating ONE JavaScript scene module file for an existing Vite + React + PixiJS v8 project.
+
+CRITICAL OUTPUT RULE:
+- Output ONLY raw JavaScript source code.
+- No markdown.
+- No triple backticks.
+- No explanations.
+- No text before or after the code.
+If you include backticks or prose, the file is invalid.
+
+PROJECT CONTEXT
+- Route `/picijs` auto-registers all files in: `src/picijs/scenes/*.js`
+- Auto-registration expects this default export shape:
+  `{ id, title, notes, order, setupScene }`
+- Shared helpers available:
+  - `createLayer` from `../core/layers`
+  - `randomRange` from `../core/random`
+- Shared Pixi app lifecycle is already handled elsewhere.
+- You MUST NOT create/destroy `Application` in this file.
+
+REQUIRED FILE STRUCTURE (EXACT)
+1) imports
+2) `export const sceneMeta = { id, title, notes, order }`
+3) `export const setupScene = (app) => { ... }`
+4) `export default { ...sceneMeta, setupScene }`
+
+PIXI V8 DRAWING RULES (STRICT)
+Use only v8-safe chainable drawing APIs on Graphics layers:
+- `layer.clear()`
+- `layer.rect(...).fill({ color, alpha })`
+- `layer.circle(...).fill({ color, alpha })`
+- `layer.ellipse(...).fill({ color, alpha })`
+- optional: `layer.poly([...]).fill(...).stroke(...)`
+- optional: `layer.moveTo(...); layer.lineTo(...); layer.stroke({ ... })`
+Do NOT use old-style APIs:
+- `beginFill`, `endFill`, `lineStyle`, `drawCircle`, `drawRect`, `drawEllipse`, `bezierCurveTo`
+Avoid nested Graphics children unless absolutely necessary.
+Prefer drawing directly on top-level layers returned by `createLayer(app)`.
+
+TECHNICAL REQUIREMENTS
+- Plain JavaScript ESM (no TypeScript).
+- Use single quotes and no semicolons.
+- Create at least 3 layers with `createLayer(app)` (background, focal, ambient).
+- Use dynamic renderer size inside tick:
+  - `const width = app.renderer.width`
+  - `const height = app.renderer.height`
+- Register ticker:
+  - `app.ticker.add(tick)`
+- Cleanup must:
+  - `app.ticker.remove(tick)`
+  - destroy each created top-level layer with `layer.destroy()`
+- Do NOT call `app.destroy()` in this file.
+- Keep performance reasonable (avoid huge object counts).
+
+ART DIRECTION REQUIREMENTS
+- Scene must feel meditation-oriented, beautiful, and intentional.
+- Include all of these:
+  - one clear focal element
+  - ambient secondary motion
+  - smooth calm pacing (no strobe, no harsh flashing)
+- Theme, palette, weather, and time-of-day must follow the requested concept/intention.
+- Do NOT hardcode light/dark or day/night defaults unless the request explicitly asks for them.
+- Cohesive palette and atmosphere.
+- No empty-frame risk: always render a visible background every tick.
+
+ROBUSTNESS CHECKLIST (MUST SATISFY)
+- Has `sceneMeta` with unique kebab-case `id`
+- Has `setupScene(app)` function
+- Uses only Pixi v8-safe drawing methods above
+- Adds and removes ticker callback
+- Destroys all created layers in cleanup
+- No markdown/backticks in output
+- No App lifecycle code (`new Application`, `app.destroy`)
+
+SCENE INPUTS TO USE
+- id: `SCENE_ID_HERE` (kebab-case)
+- title: `SCENE_TITLE_HERE`
+- notes: `SHORT_NOTE_HERE`
+- order: `SCENE_ORDER_HERE` (integer)
+- concept: `SCENE_CONCEPT_HERE`
+
+Generate this scene:
+
+- concept: `SCENE_CONCEPT_HERE`
+
+After reading the reference example below, generate one new scene file only.
+The reference is for structure and Pixi v8 API style only. Do not copy its specific weather/theme unless requested.
+Output only JavaScript code.
+
+REFERENCE EXAMPLE (CORRECT PIXI V8 STYLE)
+
+import { createLayer } from '../core/layers'
+import { randomRange } from '../core/random'
+
+export const sceneMeta = {
+  id: 'rain-thunder-clouds',
+  title: 'Rain + Thunder + Clouds',
+  notes: 'Scene-specific weather behavior module running on shared Pixi host infrastructure.',
+  order: 10
+}
+
+export const setupScene = (app) => {
+  const cloudLayer = createLayer(app)
+  const rainLayer = createLayer(app)
+  const flashLayer = createLayer(app)
+
+  const drops = Array.from({ length: 300 }, () => ({
+    x: randomRange(0, app.renderer.width),
+    y: randomRange(0, app.renderer.height),
+    speed: randomRange(6, 17),
+    length: randomRange(8, 22)
+  }))
+
+  const clouds = Array.from({ length: 6 }, (_, i) => ({
+    x: i * 120 - 50,
+    y: randomRange(45, 115),
+    size: randomRange(90, 180),
+    drift: randomRange(0.12, 0.42)
+  }))
+
+  let flash = 0
+
+  const drawClouds = () => {
+    cloudLayer.clear()
+
+    for (const cloud of clouds) {
+      cloud.x += cloud.drift
+      if (cloud.x > app.renderer.width + cloud.size) {
+        cloud.x = -cloud.size
+      }
+
+      cloudLayer.ellipse(cloud.x, cloud.y, cloud.size, cloud.size * 0.44)
+      cloudLayer.fill({ color: 0x182749, alpha: 0.62 })
+
+      cloudLayer.ellipse(cloud.x + cloud.size * 0.24, cloud.y + 8, cloud.size * 0.56, cloud.size * 0.3)
+      cloudLayer.fill({ color: 0x1d2d55, alpha: 0.52 })
+
+      cloudLayer.ellipse(cloud.x - cloud.size * 0.2, cloud.y + 6, cloud.size * 0.48, cloud.size * 0.28)
+      cloudLayer.fill({ color: 0x132340, alpha: 0.5 })
+    }
+  }
+
+  const drawRain = (delta) => {
+    rainLayer.clear()
+
+    for (const drop of drops) {
+      rainLayer.moveTo(drop.x, drop.y)
+      rainLayer.lineTo(drop.x - 2, drop.y + drop.length)
+      rainLayer.stroke({ width: 1.35, color: 0xa1c9ff, alpha: 0.58 })
+
+      drop.y += drop.speed * delta
+      if (drop.y > app.renderer.height + 20) {
+        drop.y = -20 - randomRange(0, 150)
+        drop.x = randomRange(0, app.renderer.width)
+      }
+    }
+  }
+
+  const drawFlash = () => {
+    flashLayer.clear()
+
+    if (Math.random() < 0.013) {
+      flash = 1
+    }
+
+    flash *= 0.9
+
+    if (flash > 0.02) {
+      flashLayer.rect(0, 0, app.renderer.width, app.renderer.height)
+      flashLayer.fill({ color: 0xe3ecff, alpha: flash * 0.65 })
+
+      flashLayer.moveTo(app.renderer.width * 0.53, 20)
+      flashLayer.lineTo(app.renderer.width * 0.48, 110)
+      flashLayer.lineTo(app.renderer.width * 0.56, 165)
+      flashLayer.lineTo(app.renderer.width * 0.5, 245)
+      flashLayer.stroke({ width: 3, color: 0xf4f8ff, alpha: flash })
+    }
+  }
+
+  const tick = (ticker) => {
+    drawClouds()
+    drawRain(ticker.deltaTime)
+    drawFlash()
+  }
+
+  app.ticker.add(tick)
+
+  return () => {
+    app.ticker.remove(tick)
+    cloudLayer.destroy()
+    rainLayer.destroy()
+    flashLayer.destroy()
+  }
+}
+
+export default {
+  ...sceneMeta,
+  setupScene
+}
+
+END OF PROMPT TO GIVE THE AI

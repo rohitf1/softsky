@@ -1,0 +1,215 @@
+TONE.JS MUSIC PRESET GENERATION MASTER PROMPT
+
+Use this exact instruction with any AI that generates new Tone.js music preset files for this project.
+
+START OF PROMPT TO GIVE THE AI
+
+You are generating ONE JavaScript music preset module file for an existing Vite + React + Tone.js project.
+
+CRITICAL OUTPUT RULE:
+- Output ONLY raw JavaScript source code.
+- No markdown.
+- No triple backticks.
+- No explanations.
+- No text before or after the code.
+If you include backticks or prose, the file is invalid.
+
+PROJECT CONTEXT
+- Route `/music` renders playable presets from: `src/music/presets/*.js`
+- Auto-registration is handled in `src/music/presets.js` via `import.meta.glob('./presets/*.js', { eager: true })`
+- Auto-registration expects each preset default export shape:
+  `{ id, title, notes, tags, colors, order, create }`
+- Shared helpers available from `../core/runtime`:
+  - `createSession`
+  - `chance`
+  - `randomBetween`
+- `createSession` already manages Tone Transport start/stop and cleanup tracking.
+- You MUST NOT edit route/UI files in this output. Only one preset module file.
+
+REQUIRED FILE STRUCTURE (EXACT)
+1) imports
+2) `const createYourPreset = (Tone) => { ... }`
+3) `export default { id, title, notes, tags, colors, order, create: createYourPreset }`
+
+TONE + RUNTIME RULES (STRICT)
+- Use plain JavaScript ESM.
+- Use single quotes and no semicolons.
+- Use `const session = createSession(Tone, BPM_NUMBER)` at the top of create function.
+- Build all nodes with session ownership:
+  - `session.own(new Tone.SomeNode(...))`
+  - `session.startSource(source)`
+  - `session.startLoop(loop)`
+- End create function with:
+  - `return session.finish()`
+- Do NOT manually call `Tone.Transport.start()` or `Tone.Transport.stop()` in your preset file.
+- Do NOT create React code, JSX, DOM code, or route code.
+
+TECHNICAL REQUIREMENTS
+- `id` must be unique kebab-case.
+- `title` and `notes` should be human-readable and concise.
+- `tags` must be an array of 2-5 short strings.
+- `colors` must be an array of exactly 2 hex color strings (e.g. `['#123456', '#abcdef']`).
+- `order` must be an integer.
+- `create` must return a teardown function through `session.finish()`.
+- Keep levels calm (avoid clipping / harsh loud bursts).
+
+SOUND DESIGN REQUIREMENTS
+- Meditation-oriented and beautiful.
+- Include all of these layers:
+  - one base bed (pad/drone/tonal texture depending on concept)
+  - one ambient motion layer (LFO, modulation, drifting behavior)
+  - one subtle accent layer (occasional events)
+  - one soft piano or piano-like melodic layer
+- Keep pacing gentle and non-jarring.
+- Avoid rapid strobing-like audio events.
+- Do NOT use `Tone.Noise`, `Tone.NoiseSynth`, or any synthetic hiss/static layer.
+- Add an explicit fade-in and fade-out using gain automation (clear, audible ramps; not abrupt starts/stops).
+- Default emotional tone (unless the concept explicitly says otherwise): calm, warm, bright, cheerful, and uplifting.
+- Prefer consonant harmony and gentle major / add9 / suspended tonal colors over tense dissonance.
+- Avoid dark, ominous, aggressive, cinematic-trailer, rock-band, or heavy-percussion outcomes unless explicitly requested.
+
+ROBUSTNESS CHECKLIST (MUST SATISFY)
+- Valid default export shape with `create` function
+- Uses `createSession(Tone, bpm)` once
+- Returns `session.finish()`
+- No React/JSX/UI code
+- No markdown/backticks in output
+- Clean imports only from `../core/runtime` (and Tone classes via passed `Tone`)
+
+PRESET INPUTS TO USE
+- id: `PRESET_ID_HERE` (kebab-case)
+- title: `PRESET_TITLE_HERE`
+- notes: `SHORT_NOTE_HERE`
+- tags: `['tag1', 'tag2', 'tag3']`
+- colors: `['#HEX_A', '#HEX_B']`
+- order: `PRESET_ORDER_HERE` (integer)
+- concept: `PRESET_CONCEPT_HERE`
+
+Generate this preset:
+
+- concept: `PRESET_CONCEPT_HERE`
+
+After reading the reference example below, generate one new preset module file only.
+The reference is for structure and modular pattern only. Do not copy its exact musical theme unless requested.
+Output only JavaScript code.
+
+REFERENCE EXAMPLE (CORRECT MODULAR MUSIC PRESET STYLE, CHEERFUL PIANO + NO NOISE + CLEAR FADES)
+
+import { chance, createSession, randomBetween } from '../core/runtime'
+
+const createSunlitPianoCalm = (Tone) => {
+  const session = createSession(Tone, 56)
+
+  const totalSeconds = 60
+  const fadeInSeconds = 5
+  const fadeOutSeconds = 8
+  const fadeOutStart = totalSeconds - fadeOutSeconds
+
+  const masterBus = session.own(new Tone.Gain(0.0001)).toDestination()
+  const limiter = session.own(new Tone.Limiter(-9)).connect(masterBus)
+  const ambience = session.own(new Tone.Reverb({
+    decay: 7.2,
+    preDelay: 0.03,
+    wet: 0.3
+  })).connect(limiter)
+  ambience.generate()
+
+  const now = Tone.now()
+  masterBus.gain.setValueAtTime(0.0001, now)
+  masterBus.gain.linearRampToValueAtTime(0.2, now + fadeInSeconds)
+
+  const padBus = session.own(new Tone.Gain(0.095)).connect(ambience)
+  const pad = session.own(new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: 'sine' },
+    envelope: { attack: 2.8, decay: 1.4, sustain: 0.7, release: 5.6 }
+  })).connect(padBus)
+
+  const chordProgression = [
+    ['C3', 'G3', 'E4', 'G4'],
+    ['F3', 'C4', 'A4', 'C5'],
+    ['G3', 'D4', 'B4', 'D5'],
+    ['C3', 'G3', 'E4', 'A4']
+  ]
+  let chordIndex = 0
+
+  session.startLoop(
+    session.own(new Tone.Loop((time) => {
+      const chord = chordProgression[chordIndex % chordProgression.length]
+      pad.triggerAttackRelease(chord, '3m', time, 0.18)
+      chordIndex += 1
+    }, '2m'))
+  )
+
+  const pianoBus = session.own(new Tone.Gain(0.12)).connect(ambience)
+  const pianoFilter = session.own(new Tone.Filter({
+    type: 'lowpass',
+    frequency: 2900,
+    Q: 0.4
+  })).connect(pianoBus)
+  const piano = session.own(new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: 'triangle' },
+    envelope: { attack: 0.01, decay: 0.42, sustain: 0.08, release: 1.2 }
+  })).connect(pianoFilter)
+
+  const pianoMotion = session.own(new Tone.LFO({
+    frequency: 0.06,
+    min: 2200,
+    max: 3600
+  }))
+  pianoMotion.connect(pianoFilter.frequency)
+  pianoMotion.start()
+
+  const pianoNotes = ['E4', 'G4', 'A4', 'B4', 'C5', 'D5']
+  session.startLoop(
+    session.own(new Tone.Loop((time) => {
+      if (!chance(0.72)) return
+      const note = pianoNotes[Math.floor(Math.random() * pianoNotes.length)]
+      piano.triggerAttackRelease(note, randomBetween(0.08, 0.22), time, randomBetween(0.07, 0.12))
+    }, '8n'), '4n')
+  )
+
+  const accentBus = session.own(new Tone.Gain(0.045)).connect(ambience)
+  const sparkle = session.own(new Tone.FMSynth({
+    harmonicity: 3.01,
+    modulationIndex: 6,
+    oscillator: { type: 'triangle' },
+    envelope: { attack: 0.01, decay: 0.9, sustain: 0, release: 1.5 },
+    modulation: { type: 'sine' }
+  })).connect(accentBus)
+
+  const accentNotes = ['E5', 'G5', 'A5', 'C6']
+  session.startLoop(
+    session.own(new Tone.Loop((time) => {
+      if (!chance(0.24)) return
+      const note = accentNotes[Math.floor(Math.random() * accentNotes.length)]
+      sparkle.triggerAttackRelease(note, '16n', time, randomBetween(0.025, 0.05))
+    }, '1n'), '2n')
+  )
+
+  let fadeOutArmed = false
+  session.startLoop(
+    session.own(new Tone.Loop((time) => {
+      if (fadeOutArmed) return
+      if (Tone.Transport.seconds < fadeOutStart) return
+
+      fadeOutArmed = true
+      masterBus.gain.cancelScheduledValues(time)
+      masterBus.gain.setValueAtTime(Math.max(masterBus.gain.value, 0.0001), time)
+      masterBus.gain.linearRampToValueAtTime(0.0001, time + fadeOutSeconds)
+    }, '2n'))
+  )
+
+  return session.finish()
+}
+
+export default {
+  id: 'sunlit-piano-calm',
+  title: 'Sunlit Piano Calm',
+  notes: 'Cheerful soft piano motifs over warm consonant harmony, with smooth fade-in and fade-out.',
+  tags: ['meditation', 'piano', 'uplifting'],
+  colors: ['#ffe7a6', '#b9e6ff'],
+  order: 12,
+  create: createSunlitPianoCalm
+}
+
+END OF PROMPT TO GIVE THE AI

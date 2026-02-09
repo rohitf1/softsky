@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Autumn sky with layered clouds" shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="autumn-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5cb8e3" />
+      <stop offset="52%" stop-color="#9fd8ec" />
+      <stop offset="100%" stop-color="#f2bb86" />
+    </linearGradient>
+    <radialGradient id="autumn-sun" cx="50%" cy="50%" r="52%">
+      <stop offset="0%" stop-color="#ffdca3" />
+      <stop offset="100%" stop-color="#ff9f4c" />
+    </radialGradient>
+    <linearGradient id="autumn-cloud-main" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff6ed" />
+      <stop offset="100%" stop-color="#ffe6cf" />
+    </linearGradient>
+    <linearGradient id="autumn-cloud-back" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f7e7d6" />
+      <stop offset="100%" stop-color="#eccab1" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#autumn-sky)" />
+
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 0; 13 -9; -6 4; 0 0" dur="17s" repeatCount="indefinite" />
+    <circle cx="1110" cy="150" r="114" fill="#ffebcf" opacity="0.62" />
+    <circle cx="1110" cy="150" r="80" fill="url(#autumn-sun)" />
+  </g>
+
+  <g transform="translate(92 166)">
+    <animateTransform attributeName="transform" type="translate" values="92 166; 124 152; 76 174; 92 166" dur="29s" repeatCount="indefinite" />
+    <ellipse cx="320" cy="156" rx="256" ry="80" fill="url(#autumn-cloud-back)" />
+    <circle cx="146" cy="134" r="78" fill="url(#autumn-cloud-back)" />
+    <circle cx="266" cy="100" r="98" fill="url(#autumn-cloud-back)" />
+    <circle cx="382" cy="112" r="84" fill="url(#autumn-cloud-back)" />
+    <circle cx="478" cy="138" r="68" fill="url(#autumn-cloud-back)" />
+    <path d="M64 172C131 202 500 202 576 172C522 198 420 214 320 214C220 214 118 198 64 172Z" fill="#e9c2a5" />
+  </g>
+
+  <g transform="translate(782 78)">
+    <animateTransform attributeName="transform" type="translate" values="782 78; 752 90; 798 70; 782 78" dur="37s" repeatCount="indefinite" />
+    <ellipse cx="282" cy="138" rx="230" ry="72" fill="url(#autumn-cloud-main)" />
+    <circle cx="134" cy="120" r="68" fill="url(#autumn-cloud-main)" />
+    <circle cx="232" cy="92" r="86" fill="url(#autumn-cloud-main)" />
+    <circle cx="334" cy="102" r="74" fill="url(#autumn-cloud-main)" />
+    <circle cx="418" cy="128" r="60" fill="url(#autumn-cloud-main)" />
+    <path d="M56 152C114 177 430 180 506 152C455 174 375 187 282 187C194 187 106 174 56 152Z" fill="#f3d6bd" />
+  </g>
+
+  <g transform="translate(468 204)">
+    <animateTransform attributeName="transform" type="translate" values="468 204; 534 178; 444 222; 468 204" dur="25s" repeatCount="indefinite" />
+    <ellipse cx="238" cy="120" rx="194" ry="62" fill="url(#autumn-cloud-main)" />
+    <circle cx="116" cy="104" r="58" fill="url(#autumn-cloud-main)" />
+    <circle cx="198" cy="82" r="74" fill="url(#autumn-cloud-main)" />
+    <circle cx="282" cy="90" r="64" fill="url(#autumn-cloud-main)" />
+    <circle cx="352" cy="112" r="50" fill="url(#autumn-cloud-main)" />
+    <path d="M42 140C91 160 380 162 442 140C402 155 324 168 238 168C154 168 84 158 42 140Z" fill="#f4d7bf" />
+  </g>
+
+  <g opacity="0.35">
+    <ellipse cx="290" cy="824" rx="500" ry="122" fill="#cf8f4f" />
+    <ellipse cx="1282" cy="836" rx="560" ry="132" fill="#bb7a42" />
+  </g>
+</svg>

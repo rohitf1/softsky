@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Winter sky with layered clouds" shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="winter-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#83b7d8" />
+      <stop offset="54%" stop-color="#bddbea" />
+      <stop offset="100%" stop-color="#e8f3fa" />
+    </linearGradient>
+    <radialGradient id="winter-sun" cx="50%" cy="50%" r="52%">
+      <stop offset="0%" stop-color="#f6fbff" />
+      <stop offset="100%" stop-color="#dcecf7" />
+    </radialGradient>
+    <linearGradient id="winter-cloud-main" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbfeff" />
+      <stop offset="100%" stop-color="#e6f2fa" />
+    </linearGradient>
+    <linearGradient id="winter-cloud-back" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e7f1f8" />
+      <stop offset="100%" stop-color="#cfdfeb" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#winter-sky)" />
+
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 0; 12 -8; -5 3; 0 0" dur="18s" repeatCount="indefinite" />
+    <circle cx="1168" cy="142" r="112" fill="#f3f9ff" opacity="0.62" />
+    <circle cx="1168" cy="142" r="80" fill="url(#winter-sun)" />
+  </g>
+
+  <g transform="translate(76 156)">
+    <animateTransform attributeName="transform" type="translate" values="76 156; 104 144; 64 164; 76 156" dur="30s" repeatCount="indefinite" />
+    <ellipse cx="316" cy="158" rx="258" ry="82" fill="url(#winter-cloud-back)" />
+    <circle cx="142" cy="136" r="80" fill="url(#winter-cloud-back)" />
+    <circle cx="262" cy="102" r="96" fill="url(#winter-cloud-back)" />
+    <circle cx="380" cy="114" r="84" fill="url(#winter-cloud-back)" />
+    <circle cx="478" cy="140" r="68" fill="url(#winter-cloud-back)" />
+    <path d="M62 174C126 205 505 207 570 174C516 200 416 216 316 216C216 216 116 200 62 174Z" fill="#c0d8e8" />
+  </g>
+
+  <g transform="translate(790 74)">
+    <animateTransform attributeName="transform" type="translate" values="790 74; 762 86; 804 66; 790 74" dur="38s" repeatCount="indefinite" />
+    <ellipse cx="282" cy="138" rx="228" ry="72" fill="url(#winter-cloud-main)" />
+    <circle cx="136" cy="120" r="68" fill="url(#winter-cloud-main)" />
+    <circle cx="234" cy="92" r="84" fill="url(#winter-cloud-main)" />
+    <circle cx="336" cy="102" r="74" fill="url(#winter-cloud-main)" />
+    <circle cx="420" cy="128" r="58" fill="url(#winter-cloud-main)" />
+    <path d="M56 152C115 176 430 179 506 152C458 172 372 186 282 186C190 186 106 173 56 152Z" fill="#d5e7f3" />
+  </g>
+
+  <g transform="translate(454 202)">
+    <animateTransform attributeName="transform" type="translate" values="454 202; 514 176; 432 220; 454 202" dur="26s" repeatCount="indefinite" />
+    <ellipse cx="238" cy="122" rx="194" ry="62" fill="url(#winter-cloud-main)" />
+    <circle cx="116" cy="106" r="58" fill="url(#winter-cloud-main)" />
+    <circle cx="198" cy="84" r="74" fill="url(#winter-cloud-main)" />
+    <circle cx="282" cy="92" r="62" fill="url(#winter-cloud-main)" />
+    <circle cx="352" cy="114" r="50" fill="url(#winter-cloud-main)" />
+    <path d="M42 140C90 160 380 162 442 140C403 157 325 170 238 170C155 170 85 157 42 140Z" fill="#d8e8f3" />
+  </g>
+
+  <g opacity="0.4">
+    <ellipse cx="760" cy="820" rx="900" ry="120" fill="#d6e8f3" />
+  </g>
+</svg>

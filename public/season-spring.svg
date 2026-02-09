@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Spring sky with layered clouds" shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="spring-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#66c9f5" />
+      <stop offset="55%" stop-color="#a9e7ff" />
+      <stop offset="100%" stop-color="#e4f8ff" />
+    </linearGradient>
+    <radialGradient id="spring-sun" cx="50%" cy="50%" r="52%">
+      <stop offset="0%" stop-color="#ffe66e" />
+      <stop offset="100%" stop-color="#ffbe41" />
+    </radialGradient>
+    <linearGradient id="spring-cloud-main" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#ecf8ff" />
+    </linearGradient>
+    <linearGradient id="spring-cloud-back" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eff9ff" />
+      <stop offset="100%" stop-color="#d6ecf8" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#spring-sky)" />
+
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 0; 14 -10; -6 4; 0 0" dur="16s" repeatCount="indefinite" />
+    <circle cx="1190" cy="142" r="110" fill="#fff1b1" opacity="0.62" />
+    <circle cx="1190" cy="142" r="78" fill="url(#spring-sun)" />
+  </g>
+
+  <g transform="translate(86 164)">
+    <animateTransform attributeName="transform" type="translate" values="86 164; 116 150; 72 170; 86 164" dur="28s" repeatCount="indefinite" />
+    <ellipse cx="308" cy="152" rx="252" ry="76" fill="url(#spring-cloud-back)" />
+    <circle cx="136" cy="132" r="76" fill="url(#spring-cloud-back)" />
+    <circle cx="248" cy="98" r="94" fill="url(#spring-cloud-back)" />
+    <circle cx="358" cy="108" r="82" fill="url(#spring-cloud-back)" />
+    <circle cx="450" cy="136" r="68" fill="url(#spring-cloud-back)" />
+    <path d="M66 166C130 196 486 198 548 165C499 188 406 204 306 204C206 204 114 189 66 166Z" fill="#c9e5f6" />
+  </g>
+
+  <g transform="translate(804 74)">
+    <animateTransform attributeName="transform" type="translate" values="804 74; 776 84; 820 66; 804 74" dur="36s" repeatCount="indefinite" />
+    <ellipse cx="276" cy="134" rx="224" ry="70" fill="url(#spring-cloud-main)" />
+    <circle cx="124" cy="116" r="66" fill="url(#spring-cloud-main)" />
+    <circle cx="220" cy="88" r="84" fill="url(#spring-cloud-main)" />
+    <circle cx="320" cy="100" r="72" fill="url(#spring-cloud-main)" />
+    <circle cx="402" cy="126" r="58" fill="url(#spring-cloud-main)" />
+    <path d="M60 148C112 173 429 175 488 147C449 168 365 181 277 181C191 181 108 168 60 148Z" fill="#d6edf9" />
+  </g>
+
+  <g transform="translate(478 196)">
+    <animateTransform attributeName="transform" type="translate" values="478 196; 544 170; 456 214; 478 196" dur="24s" repeatCount="indefinite" />
+    <ellipse cx="232" cy="118" rx="190" ry="62" fill="url(#spring-cloud-main)" />
+    <circle cx="108" cy="104" r="56" fill="url(#spring-cloud-main)" />
+    <circle cx="188" cy="80" r="70" fill="url(#spring-cloud-main)" />
+    <circle cx="272" cy="88" r="62" fill="url(#spring-cloud-main)" />
+    <circle cx="342" cy="112" r="50" fill="url(#spring-cloud-main)" />
+    <path d="M42 134C90 155 352 157 420 134C378 151 303 162 232 162C160 162 90 152 42 134Z" fill="#d8eef9" />
+  </g>
+
+  <g opacity="0.36">
+    <ellipse cx="274" cy="818" rx="460" ry="120" fill="#9cd6a6" />
+    <ellipse cx="1292" cy="830" rx="520" ry="130" fill="#87c795" />
+  </g>
+</svg>

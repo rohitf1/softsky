@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Winter night sky with moon and stars" shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="winter-night-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0c2238" />
+      <stop offset="54%" stop-color="#1a3853" />
+      <stop offset="100%" stop-color="#2d576f" />
+    </linearGradient>
+    <linearGradient id="winter-night-cloud-main" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c3d3df" />
+      <stop offset="100%" stop-color="#9eb4c5" />
+    </linearGradient>
+    <linearGradient id="winter-night-cloud-back" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a9bece" />
+      <stop offset="100%" stop-color="#839db2" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#winter-night-sky)" />
+
+  <g fill="#eef8ff" opacity="0.84">
+    <animate attributeName="opacity" values="0.54;0.9;0.62;0.84" dur="9.7s" repeatCount="indefinite" />
+    <animateTransform attributeName="transform" type="translate" values="0 0; 18 6; 0 0" dur="24s" repeatCount="indefinite" />
+    <circle cx="152" cy="112" r="3.1" />
+    <circle cx="238" cy="82" r="2.5" />
+    <circle cx="326" cy="138" r="2.8" />
+    <circle cx="434" cy="94" r="2.4" />
+    <circle cx="548" cy="126" r="2.3" />
+    <circle cx="658" cy="88" r="3.1" />
+    <circle cx="766" cy="122" r="2.5" />
+    <circle cx="876" cy="84" r="2.6" />
+    <circle cx="986" cy="126" r="2.8" />
+    <circle cx="1098" cy="92" r="2.4" />
+    <circle cx="1314" cy="108" r="2.7" />
+    <circle cx="1426" cy="84" r="2.9" />
+  </g>
+
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 0; -11 -8; 4 3; 0 0" dur="19s" repeatCount="indefinite" />
+    <circle cx="1168" cy="142" r="80" fill="#f4fbff" />
+    <circle cx="1202" cy="130" r="80" fill="#102a44" />
+  </g>
+
+  <g transform="translate(76 156)">
+    <animateTransform attributeName="transform" type="translate" values="76 156; 102 144; 62 166; 76 156" dur="32s" repeatCount="indefinite" />
+    <ellipse cx="316" cy="158" rx="258" ry="82" fill="url(#winter-night-cloud-back)" />
+    <circle cx="142" cy="136" r="80" fill="url(#winter-night-cloud-back)" />
+    <circle cx="262" cy="102" r="96" fill="url(#winter-night-cloud-back)" />
+    <circle cx="380" cy="114" r="84" fill="url(#winter-night-cloud-back)" />
+    <circle cx="478" cy="140" r="68" fill="url(#winter-night-cloud-back)" />
+    <path d="M62 174C126 205 505 207 570 174C516 200 416 216 316 216C216 216 116 200 62 174Z" fill="#7995ab" />
+  </g>
+
+  <g transform="translate(790 74)">
+    <animateTransform attributeName="transform" type="translate" values="790 74; 760 88; 806 66; 790 74" dur="40s" repeatCount="indefinite" />
+    <ellipse cx="282" cy="138" rx="228" ry="72" fill="url(#winter-night-cloud-main)" />
+    <circle cx="136" cy="120" r="68" fill="url(#winter-night-cloud-main)" />
+    <circle cx="234" cy="92" r="84" fill="url(#winter-night-cloud-main)" />
+    <circle cx="336" cy="102" r="74" fill="url(#winter-night-cloud-main)" />
+    <circle cx="420" cy="128" r="58" fill="url(#winter-night-cloud-main)" />
+    <path d="M56 152C115 176 430 179 506 152C458 172 372 186 282 186C190 186 106 173 56 152Z" fill="#89a4b9" />
+  </g>
+
+  <g transform="translate(454 202)">
+    <animateTransform attributeName="transform" type="translate" values="454 202; 512 176; 430 222; 454 202" dur="28s" repeatCount="indefinite" />
+    <ellipse cx="238" cy="122" rx="194" ry="62" fill="url(#winter-night-cloud-main)" />
+    <circle cx="116" cy="106" r="58" fill="url(#winter-night-cloud-main)" />
+    <circle cx="198" cy="84" r="74" fill="url(#winter-night-cloud-main)" />
+    <circle cx="282" cy="92" r="62" fill="url(#winter-night-cloud-main)" />
+    <circle cx="352" cy="114" r="50" fill="url(#winter-night-cloud-main)" />
+    <path d="M42 140C90 160 380 162 442 140C403 157 325 170 238 170C155 170 85 157 42 140Z" fill="#8ca7bb" />
+  </g>
+
+  <g opacity="0.4">
+    <ellipse cx="760" cy="820" rx="900" ry="120" fill="#335c6d" />
+  </g>
+</svg>

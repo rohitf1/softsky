@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Summer sky with layered clouds" shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="summer-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#33b8ef" />
+      <stop offset="52%" stop-color="#86dbff" />
+      <stop offset="100%" stop-color="#def5ff" />
+    </linearGradient>
+    <radialGradient id="summer-sun" cx="50%" cy="50%" r="52%">
+      <stop offset="0%" stop-color="#ffe781" />
+      <stop offset="100%" stop-color="#ffb72f" />
+    </radialGradient>
+    <linearGradient id="summer-cloud-main" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e9f7ff" />
+    </linearGradient>
+    <linearGradient id="summer-cloud-back" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8f6ff" />
+      <stop offset="100%" stop-color="#cde9f8" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#summer-sky)" />
+
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 0; 16 -11; -7 5; 0 0" dur="15s" repeatCount="indefinite" />
+    <circle cx="1228" cy="130" r="120" fill="#fff1b5" opacity="0.66" />
+    <circle cx="1228" cy="130" r="84" fill="url(#summer-sun)" />
+  </g>
+
+  <g transform="translate(58 138)">
+    <animateTransform attributeName="transform" type="translate" values="58 138; 92 124; 42 146; 58 138" dur="26s" repeatCount="indefinite" />
+    <ellipse cx="344" cy="164" rx="286" ry="84" fill="url(#summer-cloud-back)" />
+    <circle cx="154" cy="142" r="86" fill="url(#summer-cloud-back)" />
+    <circle cx="286" cy="102" r="104" fill="url(#summer-cloud-back)" />
+    <circle cx="416" cy="114" r="90" fill="url(#summer-cloud-back)" />
+    <circle cx="526" cy="146" r="72" fill="url(#summer-cloud-back)" />
+    <path d="M70 180C142 214 550 214 622 180C568 205 469 220 346 220C224 220 124 204 70 180Z" fill="#c7e4f5" />
+  </g>
+
+  <g transform="translate(764 72)">
+    <animateTransform attributeName="transform" type="translate" values="764 72; 732 84; 780 64; 764 72" dur="34s" repeatCount="indefinite" />
+    <ellipse cx="286" cy="140" rx="244" ry="74" fill="url(#summer-cloud-main)" />
+    <circle cx="140" cy="122" r="72" fill="url(#summer-cloud-main)" />
+    <circle cx="240" cy="94" r="90" fill="url(#summer-cloud-main)" />
+    <circle cx="344" cy="104" r="78" fill="url(#summer-cloud-main)" />
+    <circle cx="430" cy="130" r="62" fill="url(#summer-cloud-main)" />
+    <path d="M54 154C118 181 438 184 518 154C466 177 378 191 286 191C196 191 108 178 54 154Z" fill="#d3ebf9" />
+  </g>
+
+  <g transform="translate(430 198)">
+    <animateTransform attributeName="transform" type="translate" values="430 198; 500 170; 406 218; 430 198" dur="22s" repeatCount="indefinite" />
+    <ellipse cx="250" cy="122" rx="204" ry="64" fill="url(#summer-cloud-main)" />
+    <circle cx="126" cy="106" r="60" fill="url(#summer-cloud-main)" />
+    <circle cx="212" cy="82" r="76" fill="url(#summer-cloud-main)" />
+    <circle cx="300" cy="90" r="66" fill="url(#summer-cloud-main)" />
+    <circle cx="372" cy="112" r="52" fill="url(#summer-cloud-main)" />
+    <path d="M44 140C95 162 394 164 458 140C418 158 338 170 250 170C165 170 88 158 44 140Z" fill="#d5edf9" />
+  </g>
+
+  <g opacity="0.35">
+    <ellipse cx="792" cy="780" rx="870" ry="124" fill="#f3d993" />
+  </g>
+</svg>
