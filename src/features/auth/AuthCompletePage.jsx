@@ -37,6 +37,9 @@ export default function AuthCompletePage() {
       }
     }
 
+    if (window.location.search) {
+      window.history.replaceState({}, '', '/auth/complete')
+    }
     finalize()
     return () => {
       active = false

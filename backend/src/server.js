@@ -1,5 +1,6 @@
 import cors from 'cors'
 import express from 'express'
+import { OAuth2Client } from 'google-auth-library'
 
 import { createGoogleOauthClient } from './auth/googleOauth.js'
 import { createAuthSession } from './auth/session.js'
@@ -31,6 +32,7 @@ const config = readConfig()
 const store = createStore(config)
 const generationStore = createGenerationStore(config)
 const taskQueue = createTaskQueueClient(config)
+const workerOidcClient = new OAuth2Client()
 
 const geminiGenerator = createGeminiGenerator(config)
 const bundleGenerator = createBundleGenerator({
@@ -51,14 +53,44 @@ const googleOauthClient = authReady ? createGoogleOauthClient(config) : null
 
 const app = express()
 
-const allowedOrigins = config.allowedOrigins
-  ? new Set(
-      config.allowedOrigins
-        .split(',')
-        .map((value) => value.trim())
-        .filter(Boolean)
-    )
-  : null
+const normalizeOrigin = (value) => {
+  const raw = String(value || '').trim()
+  if (!raw) return ''
+  try {
+    return new URL(raw).origin
+  } catch {
+    return ''
+  }
+}
+
+const configuredOrigins = new Set(
+  String(config.allowedOrigins || '')
+    .split(',')
+    .map((value) => normalizeOrigin(value))
+    .filter(Boolean)
+)
+
+if (configuredOrigins.size === 0) {
+  const publicOrigin = normalizeOrigin(config.publicBaseUrl)
+  if (publicOrigin) {
+    configuredOrigins.add(publicOrigin)
+  }
+}
+
+if (configuredOrigins.size === 0 && process.env.NODE_ENV !== 'production') {
+  configuredOrigins.add('http://localhost:5173')
+  configuredOrigins.add('http://127.0.0.1:5173')
+}
+
+const allowedOrigins = configuredOrigins.size > 0 ? configuredOrigins : null
+const workerOidcServiceAccount = String(config.jobs.queue.serviceAccountEmail || '').trim().toLowerCase()
+const workerOidcAudiences = Array.from(
+  new Set(
+    [config.jobs.queue.audience, config.jobs.queue.workerUrl]
+      .map((value) => String(value || '').trim())
+      .filter(Boolean)
+  )
+)
 
 const mutationLimiter = createInMemoryRateLimiter({
   windowMs: config.rateLimit.windowMs,
@@ -72,7 +104,15 @@ app.use(
   cors({
     credentials: true,
     origin(origin, callback) {
-      if (!allowedOrigins || !origin || allowedOrigins.has(origin)) {
+      if (!origin) {
+        callback(null, true)
+        return
+      }
+      if (!allowedOrigins) {
+        callback(null, false)
+        return
+      }
+      if (allowedOrigins.has(origin)) {
         callback(null, true)
         return
       }
@@ -80,6 +120,13 @@ app.use(
     }
   })
 )
+app.use((_request, response, next) => {
+  response.setHeader('X-Content-Type-Options', 'nosniff')
+  response.setHeader('X-Frame-Options', 'DENY')
+  response.setHeader('Referrer-Policy', 'no-referrer')
+  response.setHeader('Cross-Origin-Resource-Policy', 'same-site')
+  next()
+})
 app.use(
   express.json({
     limit: `${config.maxPayloadMb}mb`
@@ -127,6 +174,57 @@ const requireAuthUser = (request) => {
     throw new HttpError('Please sign in first.', 401, 'AUTH_REQUIRED')
   }
   return request.user
+}
+
+const isAllowedOidcIssuer = (value) => value === 'accounts.google.com' || value === 'https://accounts.google.com'
+
+const hasValidWorkerOidcToken = async (request) => {
+  if (!workerOidcServiceAccount || workerOidcAudiences.length === 0) {
+    return false
+  }
+
+  const header = String(request.get('authorization') || '').trim()
+  const match = header.match(/^Bearer\s+(.+)$/i)
+  if (!match?.[1]) {
+    return false
+  }
+
+  try {
+    const ticket = await workerOidcClient.verifyIdToken({
+      idToken: match[1].trim(),
+      audience: workerOidcAudiences
+    })
+    const payload = ticket.getPayload()
+    const email = String(payload?.email || '').trim().toLowerCase()
+    const emailVerified = payload?.email_verified === true || payload?.email_verified === 'true'
+    const issuer = String(payload?.iss || '').trim()
+    return Boolean(emailVerified && email && email === workerOidcServiceAccount && isAllowedOidcIssuer(issuer))
+  } catch {
+    return false
+  }
+}
+
+const requireWorkerRequest = async (request) => {
+  if (config.jobs.workerToken) {
+    const token = request.get('x-worker-token') || ''
+    if (token !== config.jobs.workerToken) {
+      throw new HttpError('Unauthorized worker token', 401, 'WORKER_TOKEN_INVALID')
+    }
+    return
+  }
+
+  if (workerOidcServiceAccount && workerOidcAudiences.length > 0) {
+    if (await hasValidWorkerOidcToken(request)) {
+      return
+    }
+    throw new HttpError('Unauthorized worker identity', 401, 'WORKER_OIDC_INVALID')
+  }
+
+  throw new HttpError(
+    'Internal worker auth is not configured correctly.',
+    503,
+    'WORKER_AUTH_NOT_CONFIGURED'
+  )
 }
 
 const parseThumbnailDataUrl = (value) => {
@@ -597,14 +695,9 @@ app.get('/api/v1/jobs/:jobId', async (request, response, next) => {
   }
 })
 
-app.post('/api/v1/internal/jobs/process', async (request, response, next) => {
+app.post('/api/v1/internal/jobs/process', mutationLimiter, async (request, response, next) => {
   try {
-    if (config.jobs.workerToken) {
-      const token = request.get('x-worker-token') || ''
-      if (token !== config.jobs.workerToken) {
-        throw new HttpError('Unauthorized worker token', 401, 'WORKER_TOKEN_INVALID')
-      }
-    }
+    await requireWorkerRequest(request)
 
     const jobId = String(request.body?.jobId || '').trim()
     if (!isValidJobId(jobId)) {

@@ -12,14 +12,39 @@ const sanitizeModuleCode = (rawCode) =>
     .replace(/^\s*export\s+function\s+/gm, 'function ')
     .replace(/^\s*export\s+\{[^}]+\};?\s*$/gm, '')
 
+const UNSAFE_MODULE_PATTERNS = [
+  /\b(?:eval|Function)\s*\(/,
+  /constructor\s*\.\s*constructor/,
+  /\bimport\s*\(/,
+  /\brequire\s*\(/,
+  /\b(?:window|document|localStorage|sessionStorage|indexedDB|navigator|history|globalThis)\b/,
+  /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource)\b/,
+  /\b(?:Worker|SharedWorker|ServiceWorker)\b/
+]
+
+const assertSafeGeneratedModule = (code, label) => {
+  for (const pattern of UNSAFE_MODULE_PATTERNS) {
+    if (pattern.test(code)) {
+      throw new Error(`Generated ${label} module contains blocked pattern: ${pattern}`)
+    }
+  }
+}
 
 export const compileSceneModule = ({ code, runtime }) => {
   const sanitizedCode = sanitizeModuleCode(code)
+  assertSafeGeneratedModule(sanitizedCode, 'scene')
 
   const factory = new Function(
     'deps',
     `
+'use strict'
 const { createLayer, randomRange } = deps
+const window = undefined
+const document = undefined
+const fetch = undefined
+const XMLHttpRequest = undefined
+const WebSocket = undefined
+const EventSource = undefined
 ${sanitizedCode}
 
 const candidate =
@@ -45,11 +70,19 @@ return {
 
 export const compileMusicModule = ({ code, runtime }) => {
   const sanitizedCode = sanitizeModuleCode(code)
+  assertSafeGeneratedModule(sanitizedCode, 'music')
 
   const factory = new Function(
     'deps',
     `
+'use strict'
 const { createSession, chance, randomBetween } = deps
+const window = undefined
+const document = undefined
+const fetch = undefined
+const XMLHttpRequest = undefined
+const WebSocket = undefined
+const EventSource = undefined
 ${sanitizedCode}
 
 const candidate =
