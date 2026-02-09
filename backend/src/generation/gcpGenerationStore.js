@@ -16,7 +16,13 @@ const asIsoTime = (value) => {
 const sortByCreatedAtDesc = (values) =>
   values.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
 
-export const createGcpGenerationStore = ({ projectId, bucketName, generationsCollection, generationObjectPrefix }) => {
+export const createGcpGenerationStore = ({
+  projectId,
+  bucketName,
+  generationsCollection,
+  generationObjectPrefix,
+  generationQuotaCollection
+}) => {
   if (!bucketName) {
     throw new Error('SHARE_GCS_BUCKET is required when SHARE_STORE_DRIVER=gcp')
   }
@@ -24,6 +30,7 @@ export const createGcpGenerationStore = ({ projectId, bucketName, generationsCol
   const firestore = new Firestore(projectId ? { projectId } : undefined)
   const storage = new Storage(projectId ? { projectId } : undefined)
   const collection = firestore.collection(generationsCollection)
+  const quotaCollection = firestore.collection(generationQuotaCollection || 'generationDailyQuota')
   const bucket = storage.bucket(bucketName)
   const prefix = normalizePrefix(generationObjectPrefix || 'generations')
 
@@ -95,6 +102,69 @@ export const createGcpGenerationStore = ({ projectId, bucketName, generationsCol
         .get()
 
       return snapshot.size
+    },
+    async acquireGlobalDailyGenerationSlot({ dateKey, limit }) {
+      if (!dateKey || !Number.isFinite(limit) || limit <= 0) {
+        return {
+          acquired: true,
+          current: 0,
+          remaining: 0
+        }
+      }
+
+      const reference = quotaCollection.doc(dateKey)
+      const result = await firestore.runTransaction(async (transaction) => {
+        const snapshot = await transaction.get(reference)
+        const current = snapshot.exists ? Number(snapshot.data()?.count || 0) : 0
+        if (current >= limit) {
+          return {
+            acquired: false,
+            current,
+            remaining: 0
+          }
+        }
+
+        const next = current + 1
+        const timestamp = new Date().toISOString()
+        transaction.set(
+          reference,
+          {
+            dateKey,
+            count: next,
+            limit,
+            createdAt: snapshot.exists ? snapshot.data()?.createdAt || timestamp : timestamp,
+            updatedAt: timestamp
+          },
+          { merge: true }
+        )
+
+        return {
+          acquired: true,
+          current: next,
+          remaining: Math.max(0, limit - next)
+        }
+      })
+
+      return result
+    },
+    async releaseGlobalDailyGenerationSlot({ dateKey }) {
+      if (!dateKey) return
+      const reference = quotaCollection.doc(dateKey)
+
+      await firestore.runTransaction(async (transaction) => {
+        const snapshot = await transaction.get(reference)
+        if (!snapshot.exists) return
+        const current = Number(snapshot.data()?.count || 0)
+        if (current <= 0) return
+        transaction.set(
+          reference,
+          {
+            count: current - 1,
+            updatedAt: new Date().toISOString()
+          },
+          { merge: true }
+        )
+      })
     },
     async listUserGenerations(userId, { limit = 30 } = {}) {
       const snapshot = await collection

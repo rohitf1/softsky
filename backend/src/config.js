@@ -45,7 +45,8 @@ export const readConfig = () => {
       sessionTtlSeconds: asInt(process.env.AUTH_SESSION_TTL_SECONDS, 60 * 60 * 24 * 14)
     },
     generation: {
-      anonymousLimit: asInt(process.env.GENERATION_ANON_LIMIT, 3)
+      anonymousLimit: asInt(process.env.GENERATION_ANON_LIMIT, 3),
+      globalDailyLimit: 5
     },
     gemini: {
       apiKey: (process.env.GEMINI_API_KEY || '').trim(),
@@ -78,7 +79,8 @@ export const readConfig = () => {
       idempotencyCollection: (process.env.SHARE_IDEMPOTENCY_COLLECTION || 'shareIdempotency').trim(),
       jobsCollection: (process.env.SHARE_JOBS_COLLECTION || 'shareJobs').trim(),
       generationsCollection: (process.env.GENERATION_FIRESTORE_COLLECTION || 'generations').trim(),
-      generationObjectPrefix: (process.env.GENERATION_GCS_PREFIX || 'generations').trim()
+      generationObjectPrefix: (process.env.GENERATION_GCS_PREFIX || 'generations').trim(),
+      generationQuotaCollection: (process.env.GENERATION_DAILY_QUOTA_COLLECTION || 'generationDailyQuota').trim()
     }
   }
 }

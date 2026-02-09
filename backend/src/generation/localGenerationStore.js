@@ -26,12 +26,23 @@ const readAllJson = async (directoryPath) => {
 
 export const createLocalGenerationStore = ({ dataDir }) => {
   const generationsDir = path.join(dataDir, 'generations')
+  const quotaFilePath = path.join(dataDir, 'generation-daily-quota.json')
   let initialized = false
 
   const init = async () => {
     if (initialized) return
     await ensureDirectory(generationsDir)
     initialized = true
+  }
+
+  const readQuota = async () => {
+    const value = await readJsonFile(quotaFilePath)
+    if (!value || typeof value !== 'object') return {}
+    return value
+  }
+
+  const writeQuota = async (value) => {
+    await fs.writeFile(quotaFilePath, JSON.stringify(value, null, 2), 'utf8')
   }
 
   const buildGenerationPath = (generationId) => path.join(generationsDir, `${generationId}.json`)
@@ -78,6 +89,47 @@ export const createLocalGenerationStore = ({ dataDir }) => {
       await init()
       const all = await readAllJson(generationsDir)
       return all.filter((record) => record.ownerType === 'visitor' && record.ownerId === visitorId).length
+    },
+    async acquireGlobalDailyGenerationSlot({ dateKey, limit }) {
+      await init()
+      if (!dateKey || !Number.isFinite(limit) || limit <= 0) {
+        return {
+          acquired: true,
+          current: 0,
+          remaining: 0
+        }
+      }
+
+      const quota = await readQuota()
+      const current = Number(quota[dateKey] || 0)
+      if (current >= limit) {
+        return {
+          acquired: false,
+          current,
+          remaining: 0
+        }
+      }
+
+      const next = current + 1
+      quota[dateKey] = next
+      await writeQuota(quota)
+
+      return {
+        acquired: true,
+        current: next,
+        remaining: Math.max(0, limit - next)
+      }
+    },
+    async releaseGlobalDailyGenerationSlot({ dateKey }) {
+      await init()
+      if (!dateKey) return
+
+      const quota = await readQuota()
+      const current = Number(quota[dateKey] || 0)
+      if (current <= 0) return
+
+      quota[dateKey] = current - 1
+      await writeQuota(quota)
     },
     async listUserGenerations(userId, { limit = 30 } = {}) {
       await init()

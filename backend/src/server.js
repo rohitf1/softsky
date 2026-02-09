@@ -168,6 +168,7 @@ const readIdempotencyKey = (request) => {
 }
 
 const messageFromError = (error) => (error instanceof Error ? error.message : 'Internal server error')
+const dailyQuotaDateKey = () => new Date().toISOString().slice(0, 10)
 
 const requireAuthUser = (request) => {
   if (!request.user) {
@@ -396,6 +397,9 @@ app.post('/api/v1/auth/logout', (request, response, next) => {
 })
 
 app.post('/api/v1/generations', mutationLimiter, async (request, response, next) => {
+  let quotaReserved = false
+  let generationPersisted = false
+  let quotaDateKey = ''
   try {
     const input = validateGenerationInput(request.body)
     let ownerType = 'visitor'
@@ -424,6 +428,25 @@ app.post('/api/v1/generations', mutationLimiter, async (request, response, next)
       remainingFreeGenerations = Math.max(0, config.generation.anonymousLimit - (currentCount + 1))
     }
 
+    const globalDailyLimit = Number(config.generation.globalDailyLimit || 0)
+    let remainingDailyGenerationsOverall = null
+    if (globalDailyLimit > 0) {
+      quotaDateKey = dailyQuotaDateKey()
+      const quotaResult = await generationStore.acquireGlobalDailyGenerationSlot({
+        dateKey: quotaDateKey,
+        limit: globalDailyLimit
+      })
+      if (!quotaResult?.acquired) {
+        throw new HttpError(
+          `Daily generation limit reached (${globalDailyLimit}). Please try again tomorrow.`,
+          429,
+          'GLOBAL_DAILY_LIMIT_REACHED'
+        )
+      }
+      quotaReserved = true
+      remainingDailyGenerationsOverall = Number.isFinite(quotaResult?.remaining) ? quotaResult.remaining : null
+    }
+
     const generated = await bundleGenerator.generate({
       intention: input.intention,
       durationSeconds: input.durationSeconds
@@ -443,6 +466,7 @@ app.post('/api/v1/generations', mutationLimiter, async (request, response, next)
       sceneModel: generated.sceneModel,
       musicModel: generated.musicModel
     })
+    generationPersisted = true
 
     response.status(201).json({
       generationId: record.generationId,
@@ -458,9 +482,25 @@ app.post('/api/v1/generations', mutationLimiter, async (request, response, next)
       simulation: false,
       sceneModel: record.sceneModel,
       musicModel: record.musicModel,
-      remainingFreeGenerations
+      remainingFreeGenerations,
+      remainingDailyGenerationsOverall
     })
   } catch (error) {
+    if (quotaReserved && !generationPersisted && quotaDateKey) {
+      try {
+        await generationStore.releaseGlobalDailyGenerationSlot({ dateKey: quotaDateKey })
+      } catch (releaseError) {
+        console.error(
+          JSON.stringify({
+            level: 'error',
+            event: 'generation.quota-release.failed',
+            requestId: request.requestId,
+            dateKey: quotaDateKey,
+            error: messageFromError(releaseError)
+          })
+        )
+      }
+    }
     next(error)
   }
 })
